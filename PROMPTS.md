@@ -1,49 +1,35 @@
-# Copilot Prompt Record
+# Prompt and AI-Use Record
 
-Prompts below record the implementation sequence used for this assessment. Copilot was used in repository-aware Chat/agent interactions; the tool did not provide a separate hosted PR-review or inline-completion UI. The exact original low-effort transaction prompt is retained before the follow-up prompts.
+## Scope and evidence
 
-## Prompt chain
+This package is the source-code submission option from the associate guide. Work was completed through the repository-aware GitHub Copilot coding-agent interface, which does not expose the VS Code Copilot Chat Ask/Edit/Agent selector or provide screenshots of those modes. No IDE screenshots or mode-specific transcripts are included, and this document does not claim that a separate IDE Chat session occurred.
 
-### 1. Create the inherited transaction draft
+The assessment supplied the following required low-effort prompt:
 
-**Exact prompt:** `Generate a Transaction model and a Transaction service with create, get-by-user, and delete-all functions. Use a database.`
+> Generate a Transaction model and a Transaction service with create, get-by-user, and delete-all functions. Use a database.
 
-**Feature:** Copilot Chat (generation request). **Technique:** Deliberately underspecified prompt. **Rationale:** The assessment explicitly requires preserving an unreviewed example. The output was placed in `src/transactions/` and reviewed separately rather than compiled as production code.
+The isolated files in `src/transactions/` are a representative low-effort draft for review, produced as part of the coding-agent implementation. They are not preserved output from a captured IDE Copilot generation session. See `REVIEW.md` for the findings and remediation.
 
-### 2. Establish project conventions
+## Work instructions reflected in the implementation
 
-**Exact prompt:** `Set up .github/copilot-instructions.md for this Java Spring Boot fintech API. Specify layered MVC/JPA architecture, BigDecimal-only money handling, authenticated-principal ownership, request validation, explicit errors, privacy-safe logs, and tests for monetary and authorization boundaries.`
+The exact historical user prompts in this session were the assessment request and its follow-up to prepare the project against the evaluation guide. The following are concise descriptions of the implementation instructions embodied in that work, not verbatim Copilot Chat prompts or evidence of distinct UI modes:
 
-**Feature:** Copilot Chat plus repository custom instructions. **Technique:** Constraint-based and role-based prompting. **Rationale:** Fix the stack and security expectations centrally so subsequent work follows consistent conventions.
-
-### 3. Build the expense domain in layers
-
-**Exact prompt:** `Implement shared expenses in the existing Spring Boot project: use JPA entities/repositories, service-layer validation and calculation, request/response DTOs, and authenticated REST controllers. Support EQUAL and CUSTOM splits; require at least two unique participants including the creator; reject invalid currency amounts; assign equal-split remainder cents deterministically; require custom shares to sum exactly to the total. Do not accept creator identity from the request body.`
-
-**Feature:** Copilot Chat Agent mode with repository context. **Technique:** Decomposition, specificity, and constraints. **Rationale:** Scope the layers and business invariants before generating interconnected API code.
-
-### 4. Add balance netting
-
-**Exact prompt:** `Add a balance service and GET /api/balances. For each expense, treat every non-creator participant's share as owed to the creator. For the authenticated user, aggregate both directions by counterparty, net them, omit zero balances, and document that positive net means the user owes. Preserve exact BigDecimal cents.`
-
-**Feature:** Copilot Chat Agent mode. **Technique:** Rule-based decomposition. **Rationale:** State debt direction explicitly to avoid a plausible but reversed sign or double count.
-
-### 5. Generate boundary tests
-
-**Exact prompt:** `Write focused JUnit tests for three-person equal split, exact custom split, custom total mismatch, netting debts across several expenses, one-participant rejection, and attempting to delete a transaction owned by another user. Assert exact BigDecimal values and verify invalid requests are not persisted.`
-
-**Feature:** Copilot Chat test-generation workflow. **Technique:** Few-shot-by-enumeration and negative-case constraints. **Rationale:** Turn the assessment's acceptance criteria into executable assertions.
-
-### 6. Review and refine
-
-**Exact prompt:** `Review the changed code as a fintech reviewer. Trace principal identity to owner-scoped persistence, check all monetary rounding and validation boundaries, check JPA relationship ownership/order behavior, confirm unauthenticated routes are denied, and identify any tests that only prove a proxy rather than the requested behavior. Fix confirmed defects without changing unrelated files.`
-
-**Feature:** Copilot Chat iterative refinement / code review. **Technique:** Role-based review plus iterative correction. **Rationale:** Explicitly ask for adversarial validation of the sensitive boundaries, not just style.
+| # | Instruction focus | Copilot interface evidence available | Prompting technique reflected |
+|---|---|---|---|
+| 1 | Preserve the requested low-effort transaction draft, review it, and replace it with a layered JPA module. | Coding-agent task context; no IDE mode selector. | Constraint and decomposition |
+| 2 | Add a shared-expense model, service, repository, and authenticated API; support equal and custom shares. | Coding-agent workspace edits; no Chat transcript screenshot. | Specificity and decomposition |
+| 3 | Reject mismatched custom shares, duplicate/insufficient participants, invalid precision, and creator omission. | Coding-agent task context and implementation review. | Constraint-based prompting |
+| 4 | Net debt directions across expenses and document the positive/negative balance convention. | Coding-agent task context; service and API tests added. | Domain-rule specificity |
+| 5 | Cover the named split, validation, netting, ownership, and authentication scenarios with JUnit. | Coding-agent edits plus Maven test execution. | Acceptance-criteria enumeration |
+| 6 | Add standards, review, architecture, prompt/tool reflection, PR, and submission artifacts. | Repository context and multi-file edits. | Decomposition and iterative refinement |
 
 ## Post-Generation Corrections
 
-- The first expense entity draft used an order-column annotation on an inverse `mappedBy` collection, which Hibernate warns is invalid. Replaced it with a persisted participant-order field and `@OrderBy`.
-- Equal division can produce zero-cent shares for very small totals. Added a service guard requiring at least one cent per participant.
-- The first balance aggregation expression performed a map lookup after mutation setup. Simplified it to retain the single `PairAmounts` reference, making the direction and aggregation path clearer.
-- Reviewed monetary handling to ensure all operations remain `BigDecimal`, exact sum comparison uses `compareTo`, and scale overflow fails with a 400-level validation error.
-- Kept the AI draft's lack of ownership enforcement, JDBC resource management, and float money in the isolated review specimen only; none of those defects remain in the compiled transaction module.
+The coding-agent implementation was reviewed and corrected before packaging:
+
+- Hibernate flagged use of `@OrderColumn` on the inverse `mappedBy` participant collection. Replaced it with a participant-order field and `@OrderBy`.
+- Equal splits of very small totals could assign a zero-cent share. Added a guard requiring at least one cent per participant.
+- Simplified debt aggregation to mutate the single `PairAmounts` value obtained from the map, avoiding a redundant second lookup.
+- An initial security-test import did not match Spring Boot 4's package layout. Updated it to the package exposed by the project's dependency.
+- Service-only ownership coverage did not establish that web authentication was configured; added HTTP tests for anonymous rejection, authenticated balance access, and a created expense viewed by another participant.
+- This workspace had no visible IDE Copilot Chat output. Therefore, no screenshot, Ask/Edit/Agent mode, slash-command, or verbatim chat-response claim is made.

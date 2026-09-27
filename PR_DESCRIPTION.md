@@ -6,7 +6,7 @@ Adds authenticated transaction endpoints backed by owner-scoped Spring Data JPA 
 
 ## AI Tool Disclosure
 
-Copilot Chat/agent interactions were used to scaffold the layered implementation, propose tests, and review refinements. Accepted output includes routine DTO/controller/repository scaffolding after inspection. Human review overrode or corrected choices involving SQL/owner scope, JPA relationship ordering, equal-split rounding, small totals, and debt direction. Estimated contribution: approximately 55% AI-assisted scaffolding and test structure, 45% human-directed requirements, review, corrections, and documentation; this is an estimate, not a line-count measure. The current environment did not provide separate hosted PR-review or inline-completion surfaces.
+The repository-aware GitHub Copilot coding-agent generated and edited application code and documentation from the supplied assessment. The environment did not expose VS Code Ask/Edit/Agent selectors, inline suggestions, slash commands, or a hosted PR-review surface, so none are claimed as individually used. Generated code was iteratively inspected and corrected for JPA relationship ordering, cent allocation, participant validation, HTTP authentication coverage, and Spring Boot 4 test imports. Estimated contribution: approximately 75% AI-generated/assisted and 25% user-directed requirements and review; this is a rough estimate, not a line-count measure.
 
 ## Testing and known gaps
 
@@ -26,6 +26,7 @@ Balances are derived from immutable expense shares and every share remains pendi
 - [x] Invalid requests produce explicit client errors; logs exclude descriptions and amounts.
 - [x] Tests cover requested success, rejection, netting, and authorization scenarios.
 - [x] Local demo authentication/database are documented as unsuitable production defaults.
+- [ ] Used `/explain` on code not fully understood (IDE slash command unavailable in this environment).
 
 ## Peer Review Simulation
 

@@ -2,35 +2,37 @@
 
 ## Feature Usage Log
 
-| # | Copilot feature | Why this feature, and what happened |
-|---|---|---|
-| 1 | Copilot Chat (Ask/conversation) | Used to translate the narrative assessment into acceptance criteria before touching feature behavior; surfaced the required outputs and security boundaries. |
-| 2 | Copilot Agent mode with repository context | Used for coordinated edits across Java, Maven, tests, and docs rather than isolated snippets; it produced a coherent Spring MVC/JPA structure. |
-| 3 | `.github/copilot-instructions.md` custom instructions | Added project-specific architecture, financial precision, and ownership rules; later changes followed those conventions. |
-| 4 | Agent-driven multi-file edits (Copilot Edits workflow) | Applied related entity/service/controller changes together; review caught a relationship-ordering mismatch before it remained in the design. |
-| 5 | Chat-based test generation | Converted acceptance criteria into JUnit scenarios; exact monetary values and a foreign-owner deletion check made the expected behavior concrete. |
-| 6 | Iterative Chat review/refinement | Asked for an adversarial fintech review rather than accepting the first code draft; corrected edge cases and documented remaining limitations. |
+The implementation used the repository-aware GitHub Copilot coding-agent environment. The environment did not expose the VS Code Chat mode selector, inline ghost text, slash commands, hosted code review, or screenshots; those UI features are not presented as having been exercised.
 
-This environment exposed the agent/chat coding workflow, not separate IDE inline-completion, hosted pull-request review, or CI setup experiences; those are not claimed as executed.
+| # | Where used | Copilot capability used | Why this capability | What happened |
+|---|---|---|---|---|
+| 1 | Whole assessment | Repository/workspace context in the coding-agent task | The requirements referenced an existing Spring Boot project and several connected deliverables; shared repository context kept the changes consistent. | Inspected the Maven project and built on its Java/Spring stack instead of creating a separate application. |
+| 2 | Project standards | Repository file creation/editing | Project-wide instructions need to live in a committed, reusable location. | Added `.github/copilot-instructions.md` with the stack, layering, money, security, and testing rules. |
+| 3 | Transaction and expense modules | Multi-file coding-agent edits | Entities, repositories, services, controllers, and configuration must agree on DTOs and identity boundaries. | Implemented the feature layers together; review corrected a JPA ordering mismatch. |
+| 4 | Test and compile cycles | Terminal/build-tool execution via the coding environment | Running the project's existing Maven commands verifies actual compilation and behavior rather than relying on generated reasoning. | Corrected the Spring Boot 4 test import and verified service plus HTTP security tests. |
+| 5 | Review and remediation | Repository inspection and iterative coding-agent refinement | Security and financial invariants cross multiple files and cannot be checked from a single snippet. | Identified and fixed money-rounding and participant ordering edge cases; preserved the unreviewed specimen outside production sources. |
+| 6 | Submission packaging | Repository-aware file and archive operations | The guide permits source ZIP delivery, which avoids representing unavailable IDE screenshots as evidence. | Added architecture/flow and test case documentation and packaged source without build output or dependency caches. |
 
 ## Scenario Responses
 
-**Understand a complex 500-line function in an unfamiliar codebase:** Use Copilot Chat with the function and relevant callers in repository context. Ask for a control-flow summary, side effects, invariants, and dependencies, then verify each claim against the code before changing it.
+**Understand a complex 500-line function in an unfamiliar codebase:** Use Copilot Chat with the function and relevant callers in repository context. Ask for control flow, side effects, invariants, and dependencies, then verify its account against the source before editing.
 
-**Add consistent error handling across eight route handlers:** Use Copilot Agent mode with all eight handlers and the existing error conventions in context. Ask it to make a consistent, scoped edit and add/adjust tests for status and response shape; review every route diff to avoid changing endpoint semantics.
+**Add consistent error handling across eight route handlers:** Use Copilot Agent mode with all handlers and current error conventions in context. Ask for a consistent scoped change and focused response tests, then inspect each diff for unintended endpoint behavior changes.
 
-**Quickly verify an international phone-number regex:** Use Copilot Chat to explain the regex and generate a focused set of country/format edge cases, then execute those cases in the project's existing test runner. Do not trust a generated regex or a few happy-path examples as proof of international validity.
+**Quickly verify an international phone-number regex:** Use Copilot Chat to explain the expression and generate representative country/format edge cases, then run those cases in the project's existing test runner. A generated regex or a handful of examples is not proof of universal international validity.
 
-**Enforce automated quality checks on every pull request:** Use GitHub Actions workflows and required branch-protection checks, not Copilot Chat. A human-free PR gate needs repository automation configured to run and block merges on failing checks.
+**Enforce automated code-quality checks on every pull request:** Configure GitHub Actions and required branch-protection checks rather than relying on a Copilot chat feature. Repository automation must run checks and block merges when they fail.
 
-**Review an AI-generated authentication module for vulnerabilities:** Use GitHub Copilot code review or Copilot Chat in reviewer role, giving it the full auth flow and explicit threat model (credential storage, authorization, token lifecycle, injection, and secrets). Treat findings as leads, then manually trace trust boundaries and test exploit-relevant cases; AI review is not a security sign-off.
+**Review an AI-generated authentication module for vulnerabilities:** Use Copilot code review or Chat in reviewer role with the complete auth flow and an explicit threat model covering credential storage, authorization, token lifecycle, injection, and secrets. Treat findings as leads and manually trace trust boundaries; AI review is not security sign-off.
 
-**Ensure consistent project conventions across developers and sessions:** Add committed `.github/copilot-instructions.md` instructions and keep them specific, testable, and versioned with the code. This is more reliable than relying on a developer's conversation history or repeating a long prompt.
+**Ensure consistent project conventions across developers and sessions:** Commit `.github/copilot-instructions.md` with specific, testable rules. Versioned project instructions are more reliable than depending on conversation history or each developer repeating the same prompt.
 
 ## Limitations Encountered
 
-1. **Relationship ordering:** During entity design, an inverse JPA `mappedBy` collection was initially given an `@OrderColumn`; Hibernate warned this mapping is not valid for that relationship. The warning exposed a persistence-level issue that ordinary service unit tests would miss. Replaced it with an explicit participant-order column and `@OrderBy`; future prompts should name the owning side and request Hibernate-compatible mapping.
-2. **Sub-cent equal allocations:** The first equal-split logic distributed the remainder but did not prevent a total smaller than the participant count in cents, allowing a zero share. Boundary reasoning found the issue; the service now rejects totals that cannot give each participant at least one cent. Future prompts should include tiny totals and zero-share invariants, not only typical amounts.
-3. **Authentication coverage:** The first test pass denied deletion under the wrong owner at service level, but did not prove the web security filter returned 401 to an unauthenticated caller. Self-review identified the coverage mismatch; added MockMvc checks for unauthenticated and authenticated balance requests. Future work should add an HTTP-level cross-user transaction deletion test to verify principal propagation end to end.
+| # | What was prompted/done | Incorrect, incomplete, or inappropriate output | Detection | Correction | What to do differently |
+|---|---|---|---|---|---|
+| 1 | Designed ordered JPA expense participants. | An initial inverse `mappedBy` collection used `@OrderColumn`; Hibernate warned that this mapping was invalid for the relationship. | Read the ORM startup warning during test execution; unit-only tests would not reveal it. | Stored participant order on the owning participant entity and used `@OrderBy`. | Specify the owning side and validate entity mappings by starting the real persistence context. |
+| 2 | Implemented equal split remainder handling. | A small total could give one participant zero cents despite the deterministic remainder policy. | Reasoned through totals smaller than the participant count in cents. | Reject totals that cannot allocate at least one cent to every participant. | Include tiny totals and zero-share invariants in the initial acceptance criteria. |
+| 3 | Added HTTP security tests. | The first ownership test exercised the service but did not establish anonymous HTTP rejection or authenticated principal flow. | Compared test coverage with the API security requirement; service calls bypass the filter chain. | Added MockMvc tests for 401 unauthenticated access, authenticated balance access, and expense-to-balance flow. | Map each security acceptance criterion to a request-level integration test. |
 
-The agent workflow assisted implementation and review but did not replace manual validation of persistence semantics, money invariants, or security coverage. The separate hosted pull-request and inline-completion tools were unavailable here.
+The source-code ZIP path does not require process screenshots. This archive therefore contains no fabricated IDE screenshots or unverified Copilot mode claims.

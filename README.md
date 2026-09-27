@@ -52,4 +52,4 @@ Example expense request:
 .\mvnw.cmd test
 ```
 
-See [ARCHITECTURE.md](ARCHITECTURE.md), [REVIEW.md](REVIEW.md), and the assessment artifacts for design, review, and implementation notes.
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the architecture and request-flow diagram, [TEST_CASES.md](TEST_CASES.md) for test documentation, [REVIEW.md](REVIEW.md) for transaction findings, and the other assessment artifacts for implementation notes.
